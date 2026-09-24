@@ -1,8 +1,0 @@
-DROP TABLE IF EXISTS usuarios_movil;
-
-CREATE TABLE usuarios_movil (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    username VARCHAR(50) NOT NULL UNIQUE,
-    password VARCHAR(100) NOT NULL,
-    rol VARCHAR(20) NOT NULL DEFAULT 'CLIENTE'
-);
