@@ -19,7 +19,8 @@ public class WebSecurityConfig {
                 .requestMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .httpBasic(withDefaults());
+            .httpBasic(withDefaults())
+            .csrf(csrf -> csrf.disable());
         return http.build(); 
     }
 
