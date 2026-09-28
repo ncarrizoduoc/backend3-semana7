@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.duoc.msBanco.exception.CuentaNotFoundException;
 import com.duoc.msBanco.exception.SaldoInsuficienteException;
+import com.duoc.msBanco.messaging.MovimientoCuentaPublisher;
 import com.duoc.msBanco.model.EstadoCuenta;
 import com.duoc.msBanco.model.MovimientoCuenta;
 import com.duoc.msBanco.model.TransferenciaRequest;
@@ -21,10 +22,12 @@ public class BancoService {
     
     private final MovimientoCuentaRepository movRepo;
     private final EstadoCuentaRepository estadoRepo;
+    private final MovimientoCuentaPublisher movPublisher;
 
-    public BancoService(MovimientoCuentaRepository movRepo, EstadoCuentaRepository estadoRepo) {
+    public BancoService(MovimientoCuentaRepository movRepo, EstadoCuentaRepository estadoRepo, MovimientoCuentaPublisher movPublisher) {
         this.movRepo = movRepo;
         this.estadoRepo = estadoRepo;
+        this.movPublisher = movPublisher;
     }
 
     // Buscar estado de cuenta por ID
@@ -95,12 +98,13 @@ public class BancoService {
         cuentaDestino.getMovimientos().add(movimientoDestino);
         
         // Guardar los cambios
-        movRepo.save(movimientoOrigen);
+        MovimientoCuenta movOrigen = movRepo.save(movimientoOrigen);
         movRepo.save(movimientoDestino);
         estadoRepo.save(cuentaOrigen);
         estadoRepo.save(cuentaDestino);
         
-        // Retornar la respuesta
+        // Publicar evento con información de transferencia y retornarla
+        movPublisher.publicarMovimientoCuenta(movOrigen);
         return movimientoOrigen;
     }
 
@@ -126,8 +130,9 @@ public class BancoService {
         }
         estadoRepo.save(cuenta);
         
-        // Registrar el movimiento y retornarlo
+        // Registrar el movimiento, publicarlo y retornarlo
         MovimientoCuenta movimientoRegistrado = movRepo.save(movimiento);
+        movPublisher.publicarMovimientoCuenta(movimientoRegistrado);
         return movimientoRegistrado;
     }
 

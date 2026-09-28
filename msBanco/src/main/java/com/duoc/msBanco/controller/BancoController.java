@@ -82,7 +82,7 @@ public class BancoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bancoService.realizarMovimiento(movimiento));
     }
 
-    // Método fallback para regsitro de movimiento bancario fallido
+    // Método fallback para registro de movimiento bancario fallido
     // Retorna un mensaje informando la no disponibilidad del servicio de banco
     public ResponseEntity<ErrorResponse> realizarMovimientoFallback(MovimientoCuenta movimiento, Throwable cause){
         Long idCuenta = movimiento.getCuentaId();
